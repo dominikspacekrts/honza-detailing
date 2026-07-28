@@ -7,7 +7,7 @@ const resendKey = process.env.RESEND_API_KEY;
 const resend = resendKey ? new Resend(resendKey) : null;
 
 const FROM =
-  process.env.BOOKING_FROM_EMAIL ?? "Honza Detailing <rezervace@hdetailing.cz>";
+  process.env.BOOKING_FROM_EMAIL ?? "HS Detailing <rezervace@hdetailing.cz>";
 
 const escape = (value: string) =>
   value.replace(/[&<>"']/g, (c) =>

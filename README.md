@@ -1,4 +1,4 @@
-# Honza Detailing
+# HS Detailing
 
 Web pro auto detailing studio — prezentace, rezervační systém s účty zákazníků,
 e-mailová potvrzení a administrace, ve které jde měnit vzhled i obsah celého webu

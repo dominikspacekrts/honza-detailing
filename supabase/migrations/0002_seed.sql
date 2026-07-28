@@ -1,5 +1,5 @@
 -- ============================================================================
--- Honza Detailing — výchozí data
+-- HS Detailing — výchozí data
 -- Ceny vycházejí z běžné úrovně českých detailing studií (léto 2026).
 -- ============================================================================
 
@@ -106,8 +106,8 @@ on conflict (slug) do nothing;
 -- ---------------------------------------------------------------------------
 insert into public.site_settings (id, data) values (true, jsonb_build_object(
   'brand', jsonb_build_object(
-    'name', 'Honza Detailing',
-    'short', 'HD',
+    'name', 'HS Detailing',
+    'short', 'HS',
     'tagline', 'Prémiový auto detailing'
   ),
   'theme', jsonb_build_object(
@@ -139,7 +139,7 @@ insert into public.site_settings (id, data) values (true, jsonb_build_object(
     'title', 'Začalo to jednou garáží a jedním Golfem',
     'paragraphs', jsonb_build_array(
       'V roce 2019 jsem si po večerech v pronajaté garáži hrál s vlastním Golfem. Leštičku jsem si koupil na zkoušku, s tím, že to „nějak zvládnu“. Zvládl jsem to špatně — a přesně to mě nastartovalo.',
-      'Následovaly stovky hodin na kurzech, tisíce hodin u vozů a spousta zkažených aplikátorů. Dneska má Honza Detailing vlastní studio s filtrovanou vodou, kontrolovaným osvětlením a vybavením, o kterém se mi tehdy ani nesnilo.',
+      'Následovaly stovky hodin na kurzech, tisíce hodin u vozů a spousta zkažených aplikátorů. Dneska má HS Detailing vlastní studio s filtrovanou vodou, kontrolovaným osvětlením a vybavením, o kterém se mi tehdy ani nesnilo.',
       'Jedna věc se ale nezměnila: v garáži je vždycky jen jeden vůz denně. Ne proto, že bychom nestíhali, ale proto, že spěch je v detailingu ta nejdražší chyba.'
     ),
     'imageUrl', '',
@@ -176,13 +176,13 @@ insert into public.site_settings (id, data) values (true, jsonb_build_object(
     'phone', '+420 777 123 456',
     'email', 'info@hdetailing.cz',
     'ico', '12345678',
-    'instagram', 'https://instagram.com/honzadetailing',
+    'instagram', 'https://instagram.com/hsdetailing',
     'facebook', '',
     'mapEmbed', '',
     'hoursNote', 'Po–Pá 8:00–18:00 · So 9:00–14:00 · Ne zavřeno'
   ),
   'seo', jsonb_build_object(
-    'title', 'Honza Detailing — prémiový auto detailing Praha',
+    'title', 'HS Detailing — prémiový auto detailing Praha',
     'description', 'Ruční mytí, renovace laku, keramická ochrana a hloubkové čištění interiéru. Rezervujte si termín online.'
   )
 )) on conflict (id) do nothing;

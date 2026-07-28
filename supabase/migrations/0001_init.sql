@@ -1,5 +1,5 @@
 -- ============================================================================
--- Honza Detailing — základní schéma
+-- HS Detailing — základní schéma
 -- ============================================================================
 
 create extension if not exists "pgcrypto";

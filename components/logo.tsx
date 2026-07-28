@@ -10,7 +10,7 @@ type LogoMarkProps = {
 };
 
 /**
- * Monogram HD ve štítu — „D" sdílí svislici s pravou nohou „H".
+ * Monogram HS ve štítu — obě písmena tažená stejnou tloušťkou tahu.
  * Přes lak přejíždí odlesk, jako když se auto otočí ke světlu.
  */
 export function LogoMark({
@@ -36,7 +36,7 @@ export function LogoMark({
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       role="img"
-      aria-label="Honza Detailing"
+      aria-label="HS Detailing"
     >
       <defs>
         <linearGradient id={stroke} x1="8" y1="4" x2="56" y2="60">
@@ -66,12 +66,21 @@ export function LogoMark({
         strokeLinejoin="round"
       />
 
-      {/* Monogram HD */}
-      <g fill="currentColor" transform="translate(-0.5 0)">
-        <rect x="17" y="20" width="5.5" height="24" rx="1.6" />
-        <rect x="22.5" y="29.5" width="6.5" height="5" />
-        <rect x="28.5" y="20" width="5.5" height="24" rx="1.6" />
-        <path d="M34 20 H38.5 C44.6 20 48 25 48 32 C48 39 44.6 44 38.5 44 H34 V37.6 H37.6 C40.9 37.6 42.1 35.4 42.1 32 C42.1 28.6 40.9 26.4 37.6 26.4 H34 Z" />
+      {/* Monogram HS */}
+      <g
+        transform="translate(-0.5 0)"
+        stroke="currentColor"
+        strokeWidth="5.5"
+        fill="none"
+        strokeLinejoin="round"
+      >
+        <path d="M19 20 V44 M30 20 V44 M19 32 H30" />
+        <path
+          d="M46 27.5 C46 24.2 43.4 22.75 41 22.75 C38.6 22.75 36 24.2 36 27
+             C36 29.8 38.6 30.9 41 31.6 C43.4 32.3 46 33.6 46 36.6
+             C46 39.6 43.4 41.25 41 41.25 C38.6 41.25 36 39.6 36 36.5"
+          strokeLinecap="round"
+        />
       </g>
 
       {/* Přejezd odlesku */}
@@ -107,7 +116,7 @@ type LogoProps = LogoMarkProps & {
 };
 
 export function Logo({
-  name = "Honza Detailing",
+  name = "HS Detailing",
   tagline,
   imageUrl,
   size = 40,
