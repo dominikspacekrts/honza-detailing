@@ -337,6 +337,41 @@ $$;
 grant execute on function public.cancel_my_booking(uuid) to authenticated;
 
 -- ============================================================================
+-- Přístup pro Data API (PostgREST)
+--
+-- Nezávisí na volbě „Automatically expose new tables" při zakládání projektu.
+-- Samotný GRANT nic neodemyká — o tom, kdo co uvidí, rozhoduje výhradně RLS
+-- nastavené výše. Bez těchto práv by ale PostgREST vracel „permission denied".
+-- ============================================================================
+grant usage on schema public to anon, authenticated;
+
+-- Čtení veřejného obsahu webu
+grant select on
+  public.services,
+  public.business_hours,
+  public.reviews,
+  public.gallery_items,
+  public.site_settings
+to anon, authenticated;
+
+-- Přihlášený zákazník: vlastní profil a vlastní rezervace (RLS hlídá „vlastní")
+grant select, insert, update on public.profiles to authenticated;
+grant select on public.bookings to authenticated;
+grant insert on public.reviews to authenticated;
+
+-- Administrátor je běžný přihlášený uživatel s příznakem is_admin;
+-- zápis mu povolí až RLS politika, proto práva dostává celá role.
+grant select, insert, update, delete on
+  public.services,
+  public.gallery_items,
+  public.reviews,
+  public.site_settings,
+  public.business_hours,
+  public.blocked_slots,
+  public.bookings
+to authenticated;
+
+-- ============================================================================
 -- Storage — veřejné buckety pro fotky
 -- ============================================================================
 insert into storage.buckets (id, name, public)
