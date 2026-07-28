@@ -120,6 +120,7 @@ const serviceSchema = z.object({
   duration_min: z.coerce.number().int().min(15, "Minimálně 15 minut.").max(2880),
   features: z.string().optional().or(z.literal("")),
   highlight: z.coerce.boolean().optional(),
+  whole_day: z.coerce.boolean().optional(),
   active: z.coerce.boolean().optional(),
   sort_order: z.coerce.number().int().min(0).max(9999),
 });
@@ -142,6 +143,7 @@ export async function saveService(
       duration_min: formData.get("duration_min"),
       features: formData.get("features"),
       highlight: formData.get("highlight") === "on",
+      whole_day: formData.get("whole_day") === "on",
       active: formData.get("active") === "on",
       sort_order: formData.get("sort_order") || 0,
     });
@@ -155,6 +157,7 @@ export async function saveService(
       description: rest.description || null,
       price_note: rest.price_note || null,
       highlight: Boolean(rest.highlight),
+      whole_day: Boolean(rest.whole_day),
       active: Boolean(rest.active),
       features: (features ?? "")
         .split("\n")

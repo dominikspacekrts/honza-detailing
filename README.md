@@ -34,6 +34,7 @@ postupně obsah těchto souborů:
 
 1. `supabase/migrations/0001_init.sql` — tabulky, RLS politiky, storage
 2. `supabase/migrations/0002_seed.sql` — služby, ceník, otevírací doba, výchozí obsah
+3. `supabase/migrations/0003_celodenni_detailing.sql` — celodenní zakázky
 
 > Ceny a texty v seedu jsou nastřelené podle běžné úrovně českých detailing studií.
 > Všechno se dá potom měnit v administraci.
@@ -86,12 +87,24 @@ Volné termíny se počítají na serveru z:
 
 - **otevírací doby** pro daný den (`/admin/provoz`),
 - **délky služby** — dlouhá zakázka potřebuje souvislý blok (`/admin/sluzby`),
+- **příznaku „celodenní"** — taková zakázka zabere celý den (viz níže),
 - **existujících rezervací** ve stavu *čeká* nebo *potvrzeno*,
 - **blokací** (dovolená, školení),
 - **minimálního předstihu** a **kroku termínů** (`/admin/vzhled → Rezervace`).
 
 Před uložením se dostupnost ověřuje ještě jednou, takže dva lidé nemůžou
 zabrat stejný slot. Vše počítá v pásmu `Europe/Prague` včetně letního času.
+
+### Celodenní zakázky
+
+Služba s příznakem **celodenní** (`services.whole_day`) funguje jinak: zabere
+celou otevírací dobu dne, takže v ten den už nejde objednat nic dalšího — ani
+krátké mytí. Zákazník proto nevybírá časové okno, ale jen **čas předání vozu**
+(nabízí se první 3 hodiny po otevření). Ten se ukládá do `bookings.dropoff_at`,
+zatímco `starts_at` / `ends_at` drží celý den.
+
+Blokování funguje oběma směry: existující hodinová zakázka znemožní objednat
+celodenní a naopak. Takto je nastavený **Kompletní detailing za 4 000 Kč**.
 
 ---
 

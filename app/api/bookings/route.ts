@@ -80,6 +80,7 @@ export async function POST(request: NextRequest) {
       stepMin: settings.booking.slotStepMin,
       busy: busy ?? [],
       leadTimeHours: settings.booking.leadTimeHours,
+      wholeDay: service.whole_day,
     });
 
     const slot = available.find(
@@ -107,8 +108,11 @@ export async function POST(request: NextRequest) {
         car_model: input.carModel || null,
         car_plate: input.carPlate || null,
         note: input.note || null,
-        starts_at: slot.startsAt,
-        ends_at: slot.endsAt,
+        // U celodenní zakázky se blokuje celá otevírací doba a čas předání
+        // se ukládá zvlášť — den tak zůstane nedostupný i pro kratší služby.
+        starts_at: slot.blockStartsAt,
+        ends_at: slot.blockEndsAt,
+        dropoff_at: service.whole_day ? slot.startsAt : null,
         price_estimate: service.price_from,
         status: "pending",
       })
@@ -145,8 +149,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       reference: booking.reference,
-      startsAt: booking.starts_at,
+      startsAt: booking.dropoff_at ?? booking.starts_at,
       endsAt: booking.ends_at,
+      wholeDay: service.whole_day,
       serviceName: service.name,
       priceFrom: service.price_from,
       email: booking.customer_email,

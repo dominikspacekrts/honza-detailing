@@ -70,7 +70,9 @@ function ServiceCard({ service }: { service: Service }) {
 
       <div className="text-ink-faint flex items-center justify-between text-xs font-medium tracking-wider uppercase">
         <span>{service.category}</span>
-        <span>{formatDuration(service.duration_min)}</span>
+        <span>
+          {service.whole_day ? "celý den" : formatDuration(service.duration_min)}
+        </span>
       </div>
 
       <h3 className="font-display group-hover:text-gradient mt-4 text-xl font-bold tracking-tight transition-all">

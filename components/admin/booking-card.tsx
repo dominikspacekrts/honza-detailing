@@ -10,7 +10,7 @@ import { formatDate, formatPrice, formatTime, formatWeekday } from "@/lib/time";
 const initial: ActionState = { status: "idle" };
 
 export type AdminBooking = Booking & {
-  services: Pick<Service, "name" | "duration_min"> | null;
+  services: Pick<Service, "name" | "duration_min" | "whole_day"> | null;
 };
 
 const NEXT_STATUS: { value: BookingStatus; label: string; primary?: boolean }[] = [
@@ -39,10 +39,12 @@ export function BookingCard({
       <div className="flex flex-wrap items-start gap-4 border-b border-[var(--line)] p-5">
         <div className="min-w-[8rem]">
           <div className="font-display text-2xl font-bold tracking-tight">
-            {formatTime(booking.starts_at)}
+            {formatTime(booking.dropoff_at ?? booking.starts_at)}
           </div>
           <div className="text-ink-faint text-xs">
-            do {formatTime(booking.ends_at)}
+            {booking.services?.whole_day
+              ? "předání · celý den"
+              : `do ${formatTime(booking.ends_at)}`}
           </div>
           {showDate && (
             <div className="text-ink-muted mt-1.5 text-xs">

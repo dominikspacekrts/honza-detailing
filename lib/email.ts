@@ -49,8 +49,15 @@ function detailTable(booking: Booking, service: Service, settings: SiteSettings)
   const rows: [string, string][] = [
     ["Služba", service.name],
     ["Termín", `${formatWeekday(booking.starts_at)} ${formatDate(booking.starts_at)}`],
-    ["Čas", `${formatTime(booking.starts_at)} – ${formatTime(booking.ends_at)}`],
-    ["Orientační cena", booking.price_estimate ? `od ${formatPrice(booking.price_estimate)}` : "dle prohlídky"],
+    service.whole_day
+      ? ["Předání vozu", `${formatTime(booking.dropoff_at ?? booking.starts_at)} — vůz máme celý den`]
+      : ["Čas", `${formatTime(booking.starts_at)} – ${formatTime(booking.ends_at)}`],
+    [
+      "Cena",
+      booking.price_estimate
+        ? `${service.price_note || "od"} ${formatPrice(booking.price_estimate)}`.trim()
+        : "dle prohlídky",
+    ],
     ["Platba", "hotově na místě"],
     ["Kód rezervace", booking.reference],
   ];

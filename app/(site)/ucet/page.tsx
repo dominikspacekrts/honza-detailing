@@ -11,7 +11,9 @@ import { formatDate, formatPrice, formatTime, formatWeekday } from "@/lib/time";
 
 export const metadata: Metadata = { title: "Můj účet" };
 
-type BookingWithService = Booking & { services: Pick<Service, "name" | "slug"> | null };
+type BookingWithService = Booking & {
+  services: Pick<Service, "name" | "slug" | "whole_day" | "price_note"> | null;
+};
 
 /** Rozdělí rezervace na nadcházející a historii. */
 function splitByTime(bookings: BookingWithService[]) {
@@ -35,7 +37,7 @@ export default async function AccountPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("bookings")
-    .select("*, services(name, slug)")
+    .select("*, services(name, slug, whole_day, price_note)")
     .eq("user_id", user.id)
     .order("starts_at", { ascending: false });
 
@@ -136,14 +138,18 @@ function BookingCard({
           value={`${formatWeekday(booking.starts_at)} ${formatDate(booking.starts_at)}`}
         />
         <Detail
-          label="Čas"
-          value={`${formatTime(booking.starts_at)} – ${formatTime(booking.ends_at)}`}
+          label={booking.services?.whole_day ? "Předání vozu" : "Čas"}
+          value={
+            booking.services?.whole_day
+              ? `${formatTime(booking.dropoff_at ?? booking.starts_at)} — celý den`
+              : `${formatTime(booking.starts_at)} – ${formatTime(booking.ends_at)}`
+          }
         />
         <Detail
           label="Cena"
           value={
             booking.price_estimate
-              ? `od ${formatPrice(booking.price_estimate)}`
+              ? `${booking.services?.price_note || "od"} ${formatPrice(booking.price_estimate)}`.trim()
               : "dle prohlídky"
           }
         />

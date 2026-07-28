@@ -25,7 +25,7 @@ export default async function AdminBookingsPage({
 
   let query = supabase
     .from("bookings")
-    .select("*, services(name, duration_min)")
+    .select("*, services(name, duration_min, whole_day)")
     .limit(200);
 
   if (FILTERS.some((f) => f.value === stav && f.value !== "vse")) {

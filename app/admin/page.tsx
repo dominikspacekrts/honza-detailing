@@ -28,7 +28,7 @@ export default async function AdminDashboard({
   const [dayRes, upcomingRes, pendingRes] = await Promise.all([
     supabase
       .from("bookings")
-      .select("*, services(name, duration_min)")
+      .select("*, services(name, duration_min, whole_day)")
       .gte("starts_at", dayStart)
       .lt("starts_at", dayEnd)
       .order("starts_at", { ascending: true }),
@@ -39,7 +39,7 @@ export default async function AdminDashboard({
       .in("status", ["pending", "confirmed"]),
     supabase
       .from("bookings")
-      .select("*, services(name, duration_min)")
+      .select("*, services(name, duration_min, whole_day)")
       .eq("status", "pending")
       .gte("starts_at", new Date().toISOString())
       .order("starts_at", { ascending: true })

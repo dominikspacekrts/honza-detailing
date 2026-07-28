@@ -31,6 +31,8 @@ export type Service = {
   features: string[];
   image_url: string | null;
   highlight: boolean;
+  /** Zakázka blokuje celou otevírací dobu dne. */
+  whole_day: boolean;
   active: boolean;
   sort_order: number;
   created_at: string;
@@ -65,6 +67,8 @@ export type Booking = {
   note: string | null;
   starts_at: string;
   ends_at: string;
+  /** Čas předání vozu u celodenních zakázek; jinak null. */
+  dropoff_at: string | null;
   status: BookingStatus;
   price_estimate: number | null;
   admin_note: string | null;

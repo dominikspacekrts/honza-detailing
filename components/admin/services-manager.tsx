@@ -48,11 +48,13 @@ export function ServicesManager({ services }: { services: Service[] }) {
                   {service.highlight && (
                     <span className="chip text-accent">Zvýrazněná</span>
                   )}
+                  {service.whole_day && <span className="chip">Celodenní</span>}
                   {!service.active && <span className="chip">Skrytá</span>}
                 </div>
                 <div className="text-ink-muted mt-1.5 text-sm">
-                  {service.category} · {formatDuration(service.duration_min)} ·{" "}
-                  {service.price_note ?? "od"} {formatPrice(service.price_from)}
+                  {service.category} ·{" "}
+                  {service.whole_day ? "celý den" : formatDuration(service.duration_min)} ·{" "}
+                  {service.price_note || ""} {formatPrice(service.price_from)}
                 </div>
                 <div className="text-ink-faint mt-1 font-mono text-xs">
                   /rezervace?sluzba={service.slug}
@@ -199,7 +201,7 @@ function ServiceForm({
         />
       </div>
 
-      <div className="grid items-end gap-5 sm:grid-cols-3">
+      <div className="grid items-end gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <Input
           label="Pořadí"
           name="sort_order"
@@ -207,6 +209,11 @@ function ServiceForm({
           min={0}
           step={10}
           defaultValue={service?.sort_order ?? nextSortOrder}
+        />
+        <Checkbox
+          label="Celodenní — zabere celý den"
+          name="whole_day"
+          defaultChecked={service?.whole_day ?? false}
         />
         <Checkbox
           label="Zvýraznit jako nejžádanější"
@@ -219,6 +226,11 @@ function ServiceForm({
           defaultChecked={service?.active ?? true}
         />
       </div>
+
+      <p className="text-ink-faint text-xs leading-relaxed">
+        U celodenní zakázky se v ten den nedá objednat nic dalšího — zákazník volí
+        jen čas, kdy vůz přiveze. Údaj „délka" se pak nepoužije.
+      </p>
 
       <Feedback state={state} />
 

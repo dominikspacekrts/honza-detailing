@@ -16,7 +16,13 @@ import {
   weekdayOf,
 } from "@/lib/time";
 
-type Slot = { startsAt: string; endsAt: string; label: string };
+type Slot = {
+  startsAt: string;
+  endsAt: string;
+  label: string;
+  blockStartsAt: string;
+  blockEndsAt: string;
+};
 type DayAvailability = { date: string; slots: Slot[] };
 
 type Confirmation = {
@@ -26,6 +32,7 @@ type Confirmation = {
   serviceName: string;
   priceFrom: number;
   email: string;
+  wholeDay: boolean;
 };
 
 const DAYS_AHEAD = 21;
@@ -178,7 +185,7 @@ export function BookingWizard({
             >
               <div className="text-ink-faint flex items-center justify-between text-xs font-medium tracking-wider uppercase">
                 <span>{s.category}</span>
-                <span>{formatDuration(s.duration_min)}</span>
+                <span>{s.whole_day ? "celý den" : formatDuration(s.duration_min)}</span>
               </div>
               <h3 className="font-display group-hover:text-gradient mt-3.5 text-lg font-bold tracking-tight transition-all">
                 {s.name}
@@ -297,11 +304,14 @@ export function BookingWizard({
             {selectedDate && !loadingDays && (
               <div className="mt-8 border-t border-[var(--line)] pt-6">
                 <h3 className="font-display text-lg font-bold tracking-tight">
-                  Volné časy — {formatWeekday(`${selectedDate}T12:00:00Z`)}{" "}
+                  {service.whole_day ? "Kdy vůz přivezete" : "Volné časy"} —{" "}
+                  {formatWeekday(`${selectedDate}T12:00:00Z`)}{" "}
                   {formatDate(`${selectedDate}T12:00:00Z`)}
                 </h3>
                 <p className="text-ink-muted mt-1 text-sm">
-                  Zakázka trvá přibližně {formatDuration(service.duration_min)}.
+                  {service.whole_day
+                    ? "Vůz u nás zůstane celý den — vyberte, kdy se vám hodí ho přivézt."
+                    : `Zakázka trvá přibližně ${formatDuration(service.duration_min)}.`}
                 </p>
 
                 {slotsForDay.length === 0 ? (
@@ -461,13 +471,24 @@ export function BookingWizard({
                   value={`${formatWeekday(slot.startsAt)} ${formatDate(slot.startsAt)}`}
                 />
                 <Row
-                  label="Čas"
-                  value={`${formatTime(slot.startsAt)} – ${formatTime(slot.endsAt)}`}
+                  label={service.whole_day ? "Předání vozu" : "Čas"}
+                  value={
+                    service.whole_day
+                      ? formatTime(slot.startsAt)
+                      : `${formatTime(slot.startsAt)} – ${formatTime(slot.endsAt)}`
+                  }
                 />
-                <Row label="Doba" value={formatDuration(service.duration_min)} />
+                <Row
+                  label="Doba"
+                  value={
+                    service.whole_day
+                      ? "celý den — auto je u nás samo"
+                      : formatDuration(service.duration_min)
+                  }
+                />
                 <Row
                   label="Cena"
-                  value={`${service.price_note ?? "od"} ${formatPrice(service.price_from)}`}
+                  value={`${service.price_note || ""} ${formatPrice(service.price_from)}`.trim()}
                   strong
                 />
                 <Row label="Platba" value="hotově na místě" />
@@ -557,8 +578,8 @@ function SelectedService({
           {service.name}
         </div>
         <div className="text-ink-muted mt-1 text-sm">
-          {formatDuration(service.duration_min)} ·{" "}
-          {service.price_note ?? "od"} {formatPrice(service.price_from)}
+          {service.whole_day ? "celý den" : formatDuration(service.duration_min)} ·{" "}
+          {service.price_note || ""} {formatPrice(service.price_from)}
         </div>
       </div>
       <button type="button" onClick={onChange} className="btn btn-ghost btn-sm">
@@ -647,10 +668,14 @@ function Success({
           value={`${formatWeekday(confirmation.startsAt)} ${formatDate(confirmation.startsAt)}`}
         />
         <Detail
-          label="Čas"
-          value={`${formatTime(confirmation.startsAt)} – ${formatTime(confirmation.endsAt)}`}
+          label={confirmation.wholeDay ? "Předání vozu" : "Čas"}
+          value={
+            confirmation.wholeDay
+              ? `${formatTime(confirmation.startsAt)} — vůz máme celý den`
+              : `${formatTime(confirmation.startsAt)} – ${formatTime(confirmation.endsAt)}`
+          }
         />
-        <Detail label="Orientační cena" value={`od ${formatPrice(confirmation.priceFrom)}`} />
+        <Detail label="Cena" value={formatPrice(confirmation.priceFrom)} />
         <Detail label="Platba" value="hotově na místě" />
       </dl>
 

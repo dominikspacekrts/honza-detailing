@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     const { data: service } = await supabase
       .from("services")
-      .select("id, slug, name, duration_min, price_from, active")
+      .select("id, slug, name, duration_min, price_from, active, whole_day")
       .eq("slug", slug)
       .eq("active", true)
       .maybeSingle();
@@ -55,6 +55,7 @@ export async function GET(request: NextRequest) {
             stepMin: settings.booking.slotStepMin,
             busy: busy ?? [],
             leadTimeHours: settings.booking.leadTimeHours,
+            wholeDay: service.whole_day,
           });
 
           return { date: dateKey, slots };
@@ -70,6 +71,7 @@ export async function GET(request: NextRequest) {
           name: service.name,
           durationMin: service.duration_min,
           priceFrom: service.price_from,
+          wholeDay: service.whole_day,
         },
         days: results,
       },
