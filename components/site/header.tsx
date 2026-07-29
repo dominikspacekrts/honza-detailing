@@ -98,9 +98,14 @@ export function Header({
               </button>
             </>
           ) : (
-            <Link href="/prihlaseni" className="btn btn-ghost btn-sm">
-              Přihlásit
-            </Link>
+            <>
+              <Link href="/prihlaseni" className="btn btn-ghost btn-sm">
+                Přihlásit
+              </Link>
+              <Link href="/registrace" className="btn btn-ghost btn-sm">
+                Registrovat
+              </Link>
+            </>
           )}
           <Link href="/rezervace" className="btn btn-primary btn-sm">
             Rezervovat
@@ -171,9 +176,14 @@ export function Header({
                 </button>
               </>
             ) : (
-              <Link href="/prihlaseni" className="btn btn-ghost w-full">
-                Přihlásit se
-              </Link>
+              <>
+                <Link href="/prihlaseni" className="btn btn-ghost w-full">
+                  Přihlásit se
+                </Link>
+                <Link href="/registrace" className="btn btn-ghost w-full">
+                  Vytvořit účet
+                </Link>
+              </>
             )}
           </div>
         </div>
