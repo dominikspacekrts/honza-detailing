@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/lib/database.types";
 
@@ -7,8 +8,12 @@ export type SessionUser = {
   profile: Profile | null;
 };
 
-/** Vrátí přihlášeného uživatele i s profilem, nebo null. */
-export async function getSessionUser(): Promise<SessionUser | null> {
+/**
+ * Vrátí přihlášeného uživatele i s profilem, nebo null.
+ * `cache()` zajistí, že se v rámci jednoho požadavku ptáme jen jednou —
+ * volá to layout i jednotlivé stránky.
+ */
+export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
   try {
     const supabase = await createClient();
     const {
@@ -26,7 +31,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   } catch {
     return null;
   }
-}
+});
 
 export async function requireAdmin(): Promise<SessionUser> {
   const user = await getSessionUser();

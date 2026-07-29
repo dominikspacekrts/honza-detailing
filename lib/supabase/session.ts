@@ -40,19 +40,9 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(redirect);
   }
 
-  if (path.startsWith("/admin") && user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("is_admin")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (!profile?.is_admin) {
-      const redirect = request.nextUrl.clone();
-      redirect.pathname = "/";
-      return NextResponse.redirect(redirect);
-    }
-  }
+  // Zda je uživatel admin se tady záměrně neřeší — stál by další dotaz do
+  // databáze při každém prokliku v administraci. Kontrolu dělá až
+  // app/admin/layout.tsx, kde profil stejně potřebujeme načíst.
 
   return response;
 }

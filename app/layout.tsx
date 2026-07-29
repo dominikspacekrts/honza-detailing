@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Archivo, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import { ThemeStyle } from "@/components/site/theme-style";
-import { getSiteSettings } from "@/lib/settings";
+import { getSettings } from "@/lib/data";
 import "./globals.css";
 
 const sans = Instrument_Sans({
@@ -22,7 +22,7 @@ const mono = JetBrains_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { seo, brand } = await getSiteSettings();
+  const { seo, brand } = await getSettings();
   return {
     title: { default: seo.title, template: `%s — ${brand.name}` },
     description: seo.description,
@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const settings = await getSiteSettings();
+  const settings = await getSettings();
 
   return (
     <html

@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { sendAdminNotification, sendBookingConfirmation } from "@/lib/email";
-import { getSiteSettings } from "@/lib/settings";
+import { getBusinessHours, getServices, getSettings } from "@/lib/data";
 import { computeSlots } from "@/lib/slots";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { toDateKey, weekdayOf } from "@/lib/time";
@@ -40,19 +40,14 @@ export async function POST(request: NextRequest) {
 
   try {
     const supabase = await createClient();
-    const settings = await getSiteSettings();
+    const [settings, services] = await Promise.all([getSettings(), getServices()]);
 
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     // --- Služba ---------------------------------------------------------
-    const { data: service } = await supabase
-      .from("services")
-      .select("*")
-      .eq("slug", input.serviceSlug)
-      .eq("active", true)
-      .maybeSingle();
+    const service = services.find((s) => s.slug === input.serviceSlug);
 
     if (!service) {
       return NextResponse.json({ error: "Vybraná služba není dostupná." }, { status: 404 });
@@ -65,13 +60,11 @@ export async function POST(request: NextRequest) {
     }
 
     const dateKey = toDateKey(startsAt);
-    const { data: hours } = await supabase
-      .from("business_hours")
-      .select("*")
-      .eq("weekday", weekdayOf(dateKey))
-      .maybeSingle();
-
-    const { data: busy } = await supabase.rpc("get_busy_ranges", { day: dateKey });
+    const [allHours, { data: busy }] = await Promise.all([
+      getBusinessHours(),
+      supabase.rpc("get_busy_ranges", { day: dateKey }),
+    ]);
+    const hours = allHours.find((h) => h.weekday === weekdayOf(dateKey));
 
     const available = computeSlots({
       dateKey,

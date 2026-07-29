@@ -1,11 +1,11 @@
 import { SiteEditor } from "@/components/admin/site-editor";
 import { AdminHeader } from "@/components/admin/ui";
-import { getSiteSettings } from "@/lib/settings";
+import { getSettings } from "@/lib/data";
 
 export const metadata = { title: "Úprava webu" };
 
 export default async function AdminAppearancePage() {
-  const settings = await getSiteSettings();
+  const settings = await getSettings();
 
   return (
     <>

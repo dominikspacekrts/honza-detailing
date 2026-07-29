@@ -10,69 +10,30 @@ import { Vouchers } from "@/components/site/sections/vouchers";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Reveal } from "@/components/site/reveal";
 import { getSessionUser } from "@/lib/auth";
-import { getSiteSettings } from "@/lib/settings";
-import { createClient } from "@/lib/supabase/server";
-import type {
-  BusinessHour,
-  GalleryItem,
-  Review,
-  Service,
-  Voucher,
-} from "@/lib/database.types";
+import {
+  averageRating,
+  getApprovedReviews,
+  getBusinessHours,
+  getGallery,
+  getServices,
+  getSettings,
+  getVouchers,
+} from "@/lib/data";
 
 export default async function HomePage() {
-  const settings = await getSiteSettings();
-  const user = await getSessionUser();
-
-  let services: Service[] = [];
-  let reviews: Review[] = [];
-  let gallery: GalleryItem[] = [];
-  let hours: BusinessHour[] = [];
-  let vouchers: Voucher[] = [];
-
-  try {
-    const supabase = await createClient();
-    const [servicesRes, reviewsRes, galleryRes, hoursRes, vouchersRes] = await Promise.all([
-      supabase
-        .from("services")
-        .select("*")
-        .eq("active", true)
-        .order("sort_order", { ascending: true }),
-      supabase
-        .from("reviews")
-        .select("*")
-        .eq("approved", true)
-        .order("featured", { ascending: false })
-        .order("created_at", { ascending: false })
-        .limit(8),
-      supabase
-        .from("gallery_items")
-        .select("*")
-        .order("featured", { ascending: false })
-        .order("sort_order", { ascending: true })
-        .order("created_at", { ascending: false })
-        .limit(9),
-      supabase.from("business_hours").select("*"),
-      supabase
-        .from("vouchers")
-        .select("*")
-        .eq("active", true)
-        .order("sort_order", { ascending: true }),
+  // Vše naráz — veřejná data jdou z cache, jen session se čte z cookies.
+  const [settings, user, services, reviews, gallery, hours, vouchers] =
+    await Promise.all([
+      getSettings(),
+      getSessionUser(),
+      getServices(),
+      getApprovedReviews(),
+      getGallery(),
+      getBusinessHours(),
+      getVouchers(),
     ]);
 
-    services = servicesRes.data ?? [];
-    reviews = reviewsRes.data ?? [];
-    gallery = galleryRes.data ?? [];
-    hours = hoursRes.data ?? [];
-    vouchers = vouchersRes.data ?? [];
-  } catch {
-    // Bez připojení k Supabase se web vykreslí s výchozím obsahem.
-  }
-
-  const average =
-    reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : null;
+  const average = averageRating(reviews);
 
   return (
     <>

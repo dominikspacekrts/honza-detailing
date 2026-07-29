@@ -1,9 +1,10 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import { sendStatusUpdate } from "@/lib/email";
 import { DEFAULT_SETTINGS, getSiteSettings, mergeSettings } from "@/lib/settings";
+import { TAGS } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
 import { zonedToUtc } from "@/lib/time";
 import type { Booking, BookingStatus, Service } from "@/lib/database.types";
@@ -31,7 +32,14 @@ async function adminClient() {
   return supabase;
 }
 
-function revalidateSite() {
+/**
+ * Zneplatní cache veřejných dat. Bez značky by změna v adminu zůstala
+ * na webu neviditelná, protože `lib/data.ts` drží obsah napříč požadavky.
+ */
+function revalidateSite(...tags: string[]) {
+  for (const tag of tags.length ? tags : Object.values(TAGS)) {
+    updateTag(tag);
+  }
   revalidatePath("/", "layout");
   revalidatePath("/admin", "layout");
 }
@@ -177,7 +185,7 @@ export async function saveService(
       );
     }
 
-    revalidateSite();
+    revalidateSite(TAGS.services);
     return ok(id ? "Služba upravena." : "Služba přidána.");
   } catch (e) {
     return fail((e as Error).message);
@@ -188,7 +196,7 @@ export async function deleteService(formData: FormData) {
   const supabase = await adminClient();
   const id = String(formData.get("id") ?? "");
   if (id) await supabase.from("services").delete().eq("id", id);
-  revalidateSite();
+  revalidateSite(TAGS.services);
 }
 
 // ===========================================================================
@@ -239,7 +247,7 @@ export async function saveGalleryItem(
 
     if (error) return fail("Zakázku se nepodařilo uložit.");
 
-    revalidateSite();
+    revalidateSite(TAGS.gallery);
     return ok(id ? "Zakázka upravena." : "Zakázka přidána do galerie.");
   } catch (e) {
     return fail((e as Error).message);
@@ -250,7 +258,7 @@ export async function deleteGalleryItem(formData: FormData) {
   const supabase = await adminClient();
   const id = String(formData.get("id") ?? "");
   if (id) await supabase.from("gallery_items").delete().eq("id", id);
-  revalidateSite();
+  revalidateSite(TAGS.gallery);
 }
 
 // ===========================================================================
@@ -307,7 +315,7 @@ export async function saveVoucher(
 
     if (error) return fail("Poukaz se nepodařilo uložit.");
 
-    revalidateSite();
+    revalidateSite(TAGS.vouchers);
     return ok(id ? "Poukaz upraven." : "Poukaz přidán.");
   } catch (e) {
     return fail((e as Error).message);
@@ -318,7 +326,7 @@ export async function deleteVoucher(formData: FormData) {
   const supabase = await adminClient();
   const id = String(formData.get("id") ?? "");
   if (id) await supabase.from("vouchers").delete().eq("id", id);
-  revalidateSite();
+  revalidateSite(TAGS.vouchers);
 }
 
 // ===========================================================================
@@ -336,14 +344,14 @@ export async function setReviewFlags(formData: FormData) {
   if (Object.keys(patch).length > 0) {
     await supabase.from("reviews").update(patch).eq("id", id);
   }
-  revalidateSite();
+  revalidateSite(TAGS.reviews);
 }
 
 export async function deleteReview(formData: FormData) {
   const supabase = await adminClient();
   const id = String(formData.get("id") ?? "");
   if (id) await supabase.from("reviews").delete().eq("id", id);
-  revalidateSite();
+  revalidateSite(TAGS.reviews);
 }
 
 // ===========================================================================
@@ -377,7 +385,7 @@ export async function saveSettings(
 
     if (error) return fail("Nastavení se nepodařilo uložit.");
 
-    revalidateSite();
+    revalidateSite(TAGS.settings);
     return ok("Vzhled webu je aktualizovaný.");
   } catch (e) {
     return fail((e as Error).message);
@@ -409,7 +417,7 @@ export async function saveBusinessHours(
     const { error } = await supabase.from("business_hours").upsert(rows);
     if (error) return fail("Otevírací dobu se nepodařilo uložit.");
 
-    revalidateSite();
+    revalidateSite(TAGS.hours);
     return ok("Otevírací doba uložena.");
   } catch (e) {
     return fail((e as Error).message);

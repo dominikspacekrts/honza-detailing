@@ -7,7 +7,10 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico)$).*)",
-  ],
+  /**
+   * Záměrně úzký výběr. Obnova session je síťové kolo na Supabase, takže běží
+   * jen tam, kde na přihlášení opravdu záleží. Veřejné stránky si session
+   * čtou samy a nepotřebují ji obnovovat při každém prokliku.
+   */
+  matcher: ["/admin/:path*", "/ucet/:path*", "/prihlaseni", "/registrace"],
 };

@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { getBusinessHours, getServices, getSettings } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
-import { getSiteSettings } from "@/lib/settings";
 import { computeSlots } from "@/lib/slots";
 import { addDaysToKey, toDateKey, weekdayOf } from "@/lib/time";
 
@@ -24,22 +24,21 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = await createClient();
-    const settings = await getSiteSettings();
+    // Ceník i otevírací doba jsou z cache; z databáze se čtou jen obsazené
+    // termíny, které se musí načítat vždy čerstvé.
+    const [settings, services, hours] = await Promise.all([
+      getSettings(),
+      getServices(),
+      getBusinessHours(),
+    ]);
 
-    const { data: service } = await supabase
-      .from("services")
-      .select("id, slug, name, duration_min, price_from, active, whole_day")
-      .eq("slug", slug)
-      .eq("active", true)
-      .maybeSingle();
-
+    const service = services.find((s) => s.slug === slug);
     if (!service) {
       return NextResponse.json({ error: "Služba nenalezena." }, { status: 404 });
     }
 
-    const { data: hours } = await supabase.from("business_hours").select("*");
-    const hoursByDay = new Map((hours ?? []).map((h) => [h.weekday, h]));
+    const supabase = await createClient();
+    const hoursByDay = new Map(hours.map((h) => [h.weekday, h]));
 
     const results = await Promise.all(
       Array.from({ length: days }, (_, i) => addDaysToKey(date, i)).map(

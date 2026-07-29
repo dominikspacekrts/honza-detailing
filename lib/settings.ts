@@ -1,5 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
-
 /** Struktura obsahu webu, kterou lze celou měnit v /admin/vzhled. */
 export type SiteSettings = {
   brand: { name: string; short: string; tagline: string; logoUrl: string };
@@ -173,18 +171,9 @@ export function mergeSettings<T>(base: T, override: unknown): T {
   return out as T;
 }
 
-/** Načte nastavení webu. Při chybějícím/nedostupném Supabase vrací výchozí obsah. */
-export async function getSiteSettings(): Promise<SiteSettings> {
-  try {
-    const supabase = await createClient();
-    const { data } = await supabase
-      .from("site_settings")
-      .select("data")
-      .eq("id", true)
-      .maybeSingle();
-
-    return mergeSettings(DEFAULT_SETTINGS, data?.data);
-  } catch {
-    return DEFAULT_SETTINGS;
-  }
-}
+/**
+ * Načte nastavení webu.
+ * Skutečné čtení i cache řeší `lib/data.ts` — tady zůstává jen tvar a výchozí
+ * hodnoty, aby se nezacyklily importy.
+ */
+export { getSettings as getSiteSettings } from "@/lib/data";

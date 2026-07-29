@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BookingWizard } from "@/components/booking/wizard";
 import { getSessionUser } from "@/lib/auth";
-import { getSiteSettings } from "@/lib/settings";
-import { createClient } from "@/lib/supabase/server";
-import type { Service } from "@/lib/database.types";
+import { getServices, getSettings } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Rezervace termínu" };
 export const dynamic = "force-dynamic";
@@ -15,20 +13,11 @@ export default async function BookingPage({
   searchParams: Promise<{ sluzba?: string }>;
 }) {
   const { sluzba } = await searchParams;
-  const [settings, user] = await Promise.all([getSiteSettings(), getSessionUser()]);
-
-  let services: Service[] = [];
-  try {
-    const supabase = await createClient();
-    const { data } = await supabase
-      .from("services")
-      .select("*")
-      .eq("active", true)
-      .order("sort_order", { ascending: true });
-    services = data ?? [];
-  } catch {
-    // řešeno níže
-  }
+  const [settings, user, services] = await Promise.all([
+    getSettings(),
+    getSessionUser(),
+    getServices(),
+  ]);
 
   return (
     <div className="container-page py-16 md:py-24">

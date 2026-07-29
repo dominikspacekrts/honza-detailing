@@ -1,7 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { updateTag } from "next/cache";
 import { z } from "zod";
+import { TAGS } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
 
 const schema = z.object({
@@ -64,7 +65,7 @@ export async function submitReview(
     return { status: "error", message: "Recenzi se nepodařilo uložit. Zkuste to prosím znovu." };
   }
 
-  revalidatePath("/");
+  updateTag(TAGS.reviews);
   return {
     status: "success",
     message: "Děkujeme! Recenzi zveřejníme, jakmile ji zkontrolujeme.",

@@ -1,14 +1,14 @@
 import { Header } from "@/components/site/header";
 import { Footer } from "@/components/site/footer";
 import { getSessionUser } from "@/lib/auth";
-import { getSiteSettings } from "@/lib/settings";
+import { getSettings } from "@/lib/data";
 
 export default async function SiteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [settings, user] = await Promise.all([getSiteSettings(), getSessionUser()]);
+  const [settings, user] = await Promise.all([getSettings(), getSessionUser()]);
 
   return (
     <>
