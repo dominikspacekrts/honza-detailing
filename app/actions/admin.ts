@@ -254,6 +254,74 @@ export async function deleteGalleryItem(formData: FormData) {
 }
 
 // ===========================================================================
+// Dárkové poukazy
+// ===========================================================================
+const voucherSchema = z.object({
+  id: z.string().uuid().optional().or(z.literal("")),
+  title: z.string().trim().min(2, "Zadejte název poukazu."),
+  description: z.string().trim().max(600).optional().or(z.literal("")),
+  value: z.coerce.number().int().min(0).max(1_000_000),
+  service_id: z.string().uuid().optional().or(z.literal("")),
+  validity_months: z.coerce
+    .number()
+    .int()
+    .min(1, "Platnost musí být alespoň 1 měsíc.")
+    .max(60),
+  highlight: z.coerce.boolean().optional(),
+  active: z.coerce.boolean().optional(),
+  sort_order: z.coerce.number().int().min(0).max(9999),
+});
+
+export async function saveVoucher(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  try {
+    const supabase = await adminClient();
+    const parsed = voucherSchema.safeParse({
+      id: formData.get("id"),
+      title: formData.get("title"),
+      description: formData.get("description"),
+      value: formData.get("value"),
+      service_id: formData.get("service_id"),
+      validity_months: formData.get("validity_months"),
+      highlight: formData.get("highlight") === "on",
+      active: formData.get("active") === "on",
+      sort_order: formData.get("sort_order") || 0,
+    });
+
+    if (!parsed.success) return fail(parsed.error.issues[0]!.message);
+
+    const { id, ...rest } = parsed.data;
+    const payload = {
+      ...rest,
+      description: rest.description || null,
+      service_id: rest.service_id || null,
+      highlight: Boolean(rest.highlight),
+      active: Boolean(rest.active),
+    };
+
+    const { error } = id
+      ? await supabase.from("vouchers").update(payload).eq("id", id)
+      : await supabase.from("vouchers").insert(payload);
+
+    if (error) return fail("Poukaz se nepodařilo uložit.");
+
+    revalidateSite();
+    return ok(id ? "Poukaz upraven." : "Poukaz přidán.");
+  } catch (e) {
+    return fail((e as Error).message);
+  }
+}
+
+export async function deleteVoucher(formData: FormData) {
+  const supabase = await adminClient();
+  const id = String(formData.get("id") ?? "");
+  if (id) await supabase.from("vouchers").delete().eq("id", id);
+  revalidateSite();
+}
+
+// ===========================================================================
 // Recenze
 // ===========================================================================
 export async function setReviewFlags(formData: FormData) {

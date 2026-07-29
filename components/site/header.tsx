@@ -16,6 +16,7 @@ const NAV = [
   { href: "/#sluzby", label: "Služby" },
   { href: "/#pribeh", label: "Příběh" },
   { href: "/#galerie", label: "Realizace" },
+  { href: "/#poukazy", label: "Poukazy" },
   { href: "/#recenze", label: "Recenze" },
   { href: "/#kontakt", label: "Kontakt" },
 ];

@@ -52,6 +52,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
             { href: "/#sluzby", label: "Služby a ceník" },
             { href: "/#pribeh", label: "Náš příběh" },
             { href: "/#galerie", label: "Realizace" },
+            { href: "/#poukazy", label: "Dárkové poukazy" },
             { href: "/#recenze", label: "Recenze" },
             { href: "/rezervace", label: "Rezervace" },
             { href: "/ucet", label: "Můj účet" },

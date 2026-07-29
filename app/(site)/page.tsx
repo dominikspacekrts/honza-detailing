@@ -6,6 +6,7 @@ import { Process } from "@/components/site/sections/process";
 import { Reviews } from "@/components/site/sections/reviews";
 import { Services } from "@/components/site/sections/services";
 import { Story } from "@/components/site/sections/story";
+import { Vouchers } from "@/components/site/sections/vouchers";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Reveal } from "@/components/site/reveal";
 import { getSessionUser } from "@/lib/auth";
@@ -16,6 +17,7 @@ import type {
   GalleryItem,
   Review,
   Service,
+  Voucher,
 } from "@/lib/database.types";
 
 export default async function HomePage() {
@@ -26,10 +28,11 @@ export default async function HomePage() {
   let reviews: Review[] = [];
   let gallery: GalleryItem[] = [];
   let hours: BusinessHour[] = [];
+  let vouchers: Voucher[] = [];
 
   try {
     const supabase = await createClient();
-    const [servicesRes, reviewsRes, galleryRes, hoursRes] = await Promise.all([
+    const [servicesRes, reviewsRes, galleryRes, hoursRes, vouchersRes] = await Promise.all([
       supabase
         .from("services")
         .select("*")
@@ -50,12 +53,18 @@ export default async function HomePage() {
         .order("created_at", { ascending: false })
         .limit(9),
       supabase.from("business_hours").select("*"),
+      supabase
+        .from("vouchers")
+        .select("*")
+        .eq("active", true)
+        .order("sort_order", { ascending: true }),
     ]);
 
     services = servicesRes.data ?? [];
     reviews = reviewsRes.data ?? [];
     gallery = galleryRes.data ?? [];
     hours = hoursRes.data ?? [];
+    vouchers = vouchersRes.data ?? [];
   } catch {
     // Bez připojení k Supabase se web vykreslí s výchozím obsahem.
   }
@@ -104,6 +113,12 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <Vouchers
+        copy={settings.vouchers}
+        vouchers={vouchers}
+        contact={settings.contact}
+      />
 
       <Reviews
         copy={settings.reviews}

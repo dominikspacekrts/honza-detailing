@@ -32,6 +32,7 @@ export type SiteSettings = {
   services: { title: string; subtitle: string };
   gallery: { title: string; subtitle: string };
   reviews: { title: string; subtitle: string };
+  vouchers: { title: string; subtitle: string; note: string };
   booking: {
     title: string;
     subtitle: string;
@@ -115,6 +116,13 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     title: "Co říkají zákazníci",
     subtitle:
       "Recenze může přidat každý, kdo u nás byl. Zveřejňujeme je bez cenzury — jen po kontrole spamu.",
+  },
+  vouchers: {
+    title: "Dárkové poukazy",
+    subtitle:
+      "Nevíte, co koupit někomu, kdo má všechno? Poukaz vystavíme na počkání a platí celý rok.",
+    note:
+      "Poukaz si vyzvednete osobně nebo vám ho pošleme e-mailem k vytištění. Platí se hotově při převzetí.",
   },
   booking: {
     title: "Rezervace termínu",

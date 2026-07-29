@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin", label: "Přehled dne", exact: true, icon: "M3 12h4l3 8 4-16 3 8h4" },
   { href: "/admin/rezervace", label: "Rezervace", icon: "M3 9h18M7 3v3m10-3v3M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" },
   { href: "/admin/sluzby", label: "Služby a ceník", icon: "M4 7h16M4 12h16M4 17h10" },
+  { href: "/admin/poukazy", label: "Dárkové poukazy", icon: "M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" },
   { href: "/admin/galerie", label: "Galerie", icon: "M4 5h16v14H4zM4 15l4.5-4.5 3.5 3.5 3-3L20 16M9 9.5a1 1 0 110-2 1 1 0 010 2z" },
   { href: "/admin/recenze", label: "Recenze", icon: "M12 3l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.9 6.1 21l1.2-6.5L2.5 9.9 9.1 9z" },
   { href: "/admin/vzhled", label: "Úprava webu", icon: "M12 3a9 9 0 100 18 2 2 0 001.7-3 2 2 0 011.7-3H18a3 3 0 003-3 9 9 0 00-9-9zM7.5 12a1 1 0 110-2 1 1 0 010 2zm3-4a1 1 0 110-2 1 1 0 010 2zm5 0a1 1 0 110-2 1 1 0 010 2z" },

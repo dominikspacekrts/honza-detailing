@@ -102,6 +102,22 @@ export type GalleryItem = {
   created_at: string;
 };
 
+export type Voucher = {
+  id: string;
+  title: string;
+  description: string | null;
+  /** Hodnota poukazu v Kč. */
+  value: number;
+  service_id: string | null;
+  /** Platnost od zakoupení v měsících. */
+  validity_months: number;
+  image_url: string | null;
+  highlight: boolean;
+  active: boolean;
+  sort_order: number;
+  created_at: string;
+};
+
 export type SiteSettingsRow = {
   id: boolean;
   data: Record<string, unknown>;
@@ -126,6 +142,7 @@ export type Database = {
       bookings: Table<Booking>;
       reviews: Table<Review>;
       gallery_items: Table<GalleryItem>;
+      vouchers: Table<Voucher>;
       site_settings: Table<SiteSettingsRow>;
     };
     Views: Record<never, never>;

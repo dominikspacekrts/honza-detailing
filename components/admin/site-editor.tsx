@@ -443,14 +443,16 @@ export function SiteEditor({ settings }: { settings: SiteSettings }) {
               description="Texty nad jednotlivými bloky hlavní stránky."
             >
               <div className="flex flex-col gap-7">
-                {(["services", "gallery", "reviews"] as const).map((key) => (
+                {(["services", "gallery", "vouchers", "reviews"] as const).map((key) => (
                   <div key={key} className="flex flex-col gap-5">
                     <div className="eyebrow">
                       {key === "services"
                         ? "Služby"
                         : key === "gallery"
                           ? "Realizace"
-                          : "Recenze"}
+                          : key === "vouchers"
+                            ? "Dárkové poukazy"
+                            : "Recenze"}
                     </div>
                     <Text
                       label="Nadpis"
@@ -462,6 +464,13 @@ export function SiteEditor({ settings }: { settings: SiteSettings }) {
                       value={draft[key].subtitle}
                       onChange={(subtitle) => set(key, { subtitle })}
                     />
+                    {key === "vouchers" && (
+                      <Area
+                        label="Poznámka pod poukazy"
+                        value={draft.vouchers.note}
+                        onChange={(note) => set("vouchers", { note })}
+                      />
+                    )}
                   </div>
                 ))}
               </div>
