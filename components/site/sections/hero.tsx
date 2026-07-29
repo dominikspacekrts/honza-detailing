@@ -56,33 +56,39 @@ export function Hero({
               </Link>
             </div>
 
-            {rating && rating.count > 0 && (
-              <div
-                className="reveal mt-8 flex items-center gap-3"
-                style={{ animationDelay: "360ms" }}
-              >
-                <div className="flex gap-0.5">
+            {/* Jedna řada drobných jistot — hodnocení, platba, nezávaznost. */}
+            <div
+              className="reveal text-ink-muted mt-9 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-[var(--line)] pt-6 text-sm"
+              style={{ animationDelay: "360ms" }}
+            >
+              {rating && rating.count > 0 && (
+                <span className="flex items-center gap-2">
+                  <span className="flex gap-0.5">
                   {Array.from({ length: 5 }, (_, i) => (
-                    <svg
-                      key={i}
-                      viewBox="0 0 24 24"
-                      className={`size-4 ${
-                        i < Math.round(rating.average) ? "text-accent" : "text-ink-faint"
-                      }`}
-                      fill="currentColor"
-                    >
-                      <path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5-4.8-4.6 6.6-.9z" />
-                    </svg>
-                  ))}
-                </div>
-                <span className="text-ink-muted text-sm">
-                  <strong className="text-ink">
-                    {rating.average.toFixed(1).replace(".", ",")}
-                  </strong>{" "}
-                  z {rating.count} recenzí
+                      <svg
+                        key={i}
+                        viewBox="0 0 24 24"
+                        className={`size-4 ${
+                          i < Math.round(rating.average) ? "text-accent" : "text-ink-faint"
+                        }`}
+                        fill="currentColor"
+                      >
+                        <path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5-4.8-4.6 6.6-.9z" />
+                      </svg>
+                    ))}
+                  </span>
+                  <span>
+                    <strong className="text-ink">
+                      {rating.average.toFixed(1).replace(".", ",")}
+                    </strong>{" "}
+                    z {rating.count} recenzí
+                  </span>
                 </span>
-              </div>
-            )}
+              )}
+
+              <Assurance>Platba hotově na místě</Assurance>
+              <Assurance>Rezervace nezávazná</Assurance>
+            </div>
           </div>
 
           {/* Vizuál */}
@@ -102,19 +108,6 @@ export function Hero({
                 <PaintPlaceholder />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-[color-mix(in_oklab,var(--bg)_88%,transparent)] via-transparent to-transparent" />
-            </div>
-
-            {/* Plovoucí štítek */}
-            <div className="glass absolute -bottom-5 left-4 flex items-center gap-3 rounded-2xl px-4 py-3 sm:left-8">
-              <div className="bg-accent/15 text-accent grid size-9 place-items-center rounded-xl">
-                <svg viewBox="0 0 24 24" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 6L9 17l-5-5" />
-                </svg>
-              </div>
-              <div className="text-xs leading-tight">
-                <div className="font-semibold">Platba hotově na místě</div>
-                <div className="text-ink-faint">Rezervace nezávazná</div>
-              </div>
             </div>
           </Reveal>
         </div>
@@ -136,6 +129,26 @@ export function Hero({
         </Reveal>
       </div>
     </section>
+  );
+}
+
+/** Drobná jistota v řadě pod tlačítky — odškrtnutá položka, ne štítek. */
+function Assurance({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="flex items-center gap-2">
+      <svg
+        viewBox="0 0 24 24"
+        className="text-accent size-4 shrink-0"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M20 6L9 17l-5-5" />
+      </svg>
+      {children}
+    </span>
   );
 }
 
