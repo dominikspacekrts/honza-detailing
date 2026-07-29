@@ -6,11 +6,10 @@ import { useEffect, useState } from "react";
 import { Logo } from "@/components/logo";
 import { createClient } from "@/lib/supabase/client";
 
-export type HeaderUser = {
-  email: string;
+type HeaderUser = {
   name: string | null;
   isAdmin: boolean;
-} | null;
+};
 
 const NAV = [
   { href: "/#sluzby", label: "Služby" },
@@ -25,16 +24,58 @@ export function Header({
   brandName,
   tagline,
   logoUrl,
-  user,
 }: {
   brandName: string;
   tagline: string;
   logoUrl: string;
-  user: HeaderUser;
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  /** `undefined` = ještě nevíme, `null` = nepřihlášen. */
+  const [user, setUser] = useState<HeaderUser | null | undefined>(undefined);
   const router = useRouter();
+
+  /**
+   * Stav přihlášení řešíme až v prohlížeči. Na serveru by to znamenalo
+   * ověřovat token u Supabase při každém zobrazení stránky — a veřejné
+   * stránky by se kvůli tomu nedaly předgenerovat.
+   */
+  useEffect(() => {
+    const supabase = createClient();
+    let active = true;
+
+    async function resolve(userId: string | null) {
+      if (!userId) {
+        if (active) setUser(null);
+        return;
+      }
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name, is_admin")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (active) {
+        setUser({
+          name: profile?.full_name ?? null,
+          isAdmin: profile?.is_admin ?? false,
+        });
+      }
+    }
+
+    supabase.auth
+      .getSession()
+      .then(({ data }) => resolve(data.session?.user.id ?? null));
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      void resolve(session?.user.id ?? null);
+    });
+
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -82,8 +123,10 @@ export function Header({
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2.5 lg:flex">
-          {user ? (
+        <div className="hidden min-h-9 items-center gap-2.5 lg:flex">
+          {user === undefined ? (
+            <span className="skeleton h-9 w-44 rounded-full" aria-hidden />
+          ) : user ? (
             <>
               {user.isAdmin && (
                 <Link href="/admin" className="btn btn-ghost btn-sm">

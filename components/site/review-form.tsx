@@ -1,15 +1,47 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { submitReview, type ReviewFormState } from "@/app/actions/reviews";
+import { createClient } from "@/lib/supabase/client";
 
 const initial: ReviewFormState = { status: "idle" };
 
-export function ReviewForm({ isLoggedIn }: { isLoggedIn: boolean }) {
+export function ReviewForm() {
   const [state, action, pending] = useActionState(submitReview, initial);
   const [rating, setRating] = useState(5);
   const [hover, setHover] = useState(0);
+  /** `undefined` = ještě zjišťujeme. Řeší se v prohlížeči, aby stránka
+      mohla zůstat předgenerovaná. */
+  const [isLoggedIn, setLoggedIn] = useState<boolean | undefined>(undefined);
+
+  useEffect(() => {
+    const supabase = createClient();
+    let active = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (active) setLoggedIn(Boolean(data.session));
+    });
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (active) setLoggedIn(Boolean(session));
+    });
+
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  if (isLoggedIn === undefined) {
+    return (
+      <div className="card p-6" aria-busy="true">
+        <div className="skeleton h-5 w-40 rounded-lg" />
+        <div className="skeleton mt-3 h-4 w-full rounded-full" />
+        <div className="skeleton mt-6 h-9 w-32 rounded-full" />
+      </div>
+    );
+  }
 
   if (!isLoggedIn) {
     return (

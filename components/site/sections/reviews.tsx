@@ -8,12 +8,10 @@ import { formatDateShort } from "@/lib/time";
 export function Reviews({
   copy,
   reviews,
-  isLoggedIn,
   average,
 }: {
   copy: SiteSettings["reviews"];
   reviews: Review[];
-  isLoggedIn: boolean;
   average: number | null;
 }) {
   return (
@@ -61,7 +59,7 @@ export function Reviews({
           </div>
 
           <Reveal delay={120} className="lg:sticky lg:top-24">
-            <ReviewForm isLoggedIn={isLoggedIn} />
+            <ReviewForm />
           </Reveal>
         </div>
       </div>

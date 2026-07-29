@@ -9,7 +9,6 @@ import { Story } from "@/components/site/sections/story";
 import { Vouchers } from "@/components/site/sections/vouchers";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Reveal } from "@/components/site/reveal";
-import { getSessionUser } from "@/lib/auth";
 import {
   averageRating,
   getApprovedReviews,
@@ -22,10 +21,9 @@ import {
 
 export default async function HomePage() {
   // Vše naráz — veřejná data jdou z cache, jen session se čte z cookies.
-  const [settings, user, services, reviews, gallery, hours, vouchers] =
+  const [settings, services, reviews, gallery, hours, vouchers] =
     await Promise.all([
       getSettings(),
-      getSessionUser(),
       getServices(),
       getApprovedReviews(),
       getGallery(),
@@ -84,7 +82,6 @@ export default async function HomePage() {
       <Reviews
         copy={settings.reviews}
         reviews={reviews}
-        isLoggedIn={Boolean(user)}
         average={average}
       />
 
