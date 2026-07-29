@@ -42,3 +42,7 @@ next-env.d.ts
 
 # vzorový konfigurační soubor je součástí repozitáře
 !.env.example
+
+# soukromé poznámky a hesla — nikdy do repozitáře
+heslo*.rtf
+*.rtf

@@ -13,7 +13,9 @@ export default async function SignUpPage({
 }) {
   const { next } = await searchParams;
   const user = await getSessionUser();
-  if (user) redirect(next?.startsWith("/") ? next : "/ucet");
+  // `//zlo.cz` je taky „cesta začínající lomítkem", ale prohlížeč ji přečte
+  // jako cizí doménu — proto se kontroluje i dvojité lomítko.
+  if (user) redirect(next?.startsWith("/") && !next.startsWith("//") ? next : "/ucet");
 
   return (
     <AuthCard

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Reveal } from "@/components/site/reveal";
 import type { BusinessHour } from "@/lib/database.types";
+import { mapEmbedSrc } from "@/lib/embed";
 import type { SiteSettings } from "@/lib/settings";
 import { WEEKDAY_LABELS } from "@/lib/time";
 
@@ -15,6 +16,7 @@ export function Contact({
 }) {
   const byWeekday = new Map(hours.map((h) => [h.weekday, h]));
   const todayWeekday = new Date().getDay();
+  const mapSrc = mapEmbedSrc(contact.mapEmbed);
 
   return (
     <section id="kontakt" className="scroll-mt-24 py-24 md:py-32">
@@ -109,11 +111,17 @@ export function Contact({
                   })}
                 </ul>
 
-                {contact.mapEmbed && (
-                  <div
-                    className="mt-6 aspect-video overflow-hidden rounded-2xl border border-[var(--line)]"
-                    dangerouslySetInnerHTML={{ __html: contact.mapEmbed }}
-                  />
+                {mapSrc && (
+                  <div className="mt-6 aspect-video overflow-hidden rounded-2xl border border-[var(--line)]">
+                    <iframe
+                      src={mapSrc}
+                      title="Mapa — kde nás najdete"
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
+                      className="size-full border-0"
+                    />
+                  </div>
                 )}
               </div>
             </div>

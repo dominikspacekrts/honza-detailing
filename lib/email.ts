@@ -14,6 +14,12 @@ const escape = (value: string) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
   );
 
+const HEX = /^#(?:[0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+
+/** Barvy jdou přímo do `style`, kde by escapování nepomohlo — proto tvrdý formát. */
+const hexColor = (value: string, fallback: string) =>
+  HEX.test(value?.trim() ?? "") ? value.trim() : fallback;
+
 type BookingEmailInput = {
   booking: Booking;
   service: Service;
@@ -21,7 +27,8 @@ type BookingEmailInput = {
 };
 
 function layout(settings: SiteSettings, title: string, inner: string) {
-  const { accent, accent2 } = settings.theme;
+  const accent = hexColor(settings.theme.accent, "#22E5C8");
+  const accent2 = hexColor(settings.theme.accent2, "#3B7BFF");
   return `<!doctype html>
 <html lang="cs"><head><meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />

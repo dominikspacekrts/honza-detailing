@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { sendAdminNotification, sendBookingConfirmation } from "@/lib/email";
 import { getBusinessHours, getServices, getSettings } from "@/lib/data";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { computeSlots } from "@/lib/slots";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { toDateKey, weekdayOf } from "@/lib/time";
@@ -21,6 +22,20 @@ const schema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // Bez stropu by skript zaplnil kalendář na měsíce dopředu a rozeslal
+  // stovky potvrzovacích e-mailů na cizí adresy.
+  const ip = await clientIp();
+  const limit = rateLimit("booking", ip, 5, 3600);
+  if (!limit.ok) {
+    return NextResponse.json(
+      {
+        error:
+          "Z této adresy přišlo příliš mnoho rezervací. Zkuste to prosím za chvíli, nebo nám zavolejte.",
+      },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSec) } },
+    );
+  }
+
   let payload: unknown;
   try {
     payload = await request.json();

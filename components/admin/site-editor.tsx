@@ -583,7 +583,7 @@ export function SiteEditor({ settings }: { settings: SiteSettings }) {
                     label="Vložená mapa (HTML kód iframe)"
                     value={draft.contact.mapEmbed}
                     onChange={(mapEmbed) => set("contact", { mapEmbed })}
-                    hint="Zkopírujte „Vložit mapu“ z Mapy.cz nebo Google Maps."
+                    hint="Zkopírujte „Vložit mapu“ z Mapy.cz nebo Google Maps. Z bezpečnostních důvodů se použije jen adresa mapy — jiné weby web nezobrazí."
                   />
                 </div>
               </Card>

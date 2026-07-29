@@ -3,6 +3,7 @@
 import { updateTag } from "next/cache";
 import { z } from "zod";
 import { TAGS } from "@/lib/data";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 
 const schema = z.object({
@@ -35,6 +36,15 @@ export async function submitReview(
   // Skryté pole, které vyplní jen robot — tváříme se, že se odeslalo.
   if (String(formData.get("website") ?? "").trim() !== "") {
     return { status: "success", message: "Děkujeme za recenzi." };
+  }
+
+  // Honeypot chytí hloupé roboty; strop na IP zbytek.
+  const limit = rateLimit("review", await clientIp(), 3, 3600);
+  if (!limit.ok) {
+    return {
+      status: "error",
+      message: "Z této adresy přišlo příliš mnoho recenzí. Zkuste to prosím později.",
+    };
   }
 
   const parsed = schema.safeParse({
