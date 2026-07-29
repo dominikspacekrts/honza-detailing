@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
 import { submitReview, type ReviewFormState } from "@/app/actions/reviews";
 import { createClient } from "@/lib/supabase/client";
@@ -11,59 +10,55 @@ export function ReviewForm() {
   const [state, action, pending] = useActionState(submitReview, initial);
   const [rating, setRating] = useState(5);
   const [hover, setHover] = useState(0);
-  /** `undefined` = ještě zjišťujeme. Řeší se v prohlížeči, aby stránka
-      mohla zůstat předgenerovaná. */
-  const [isLoggedIn, setLoggedIn] = useState<boolean | undefined>(undefined);
+  const [name, setName] = useState("");
 
+  /**
+   * Přihlášenému předvyplníme jméno z profilu. Když se to nepovede (nebo
+   * u nás nemá účet), pole prostě vyplní sám — formulář na tom nestojí.
+   */
   useEffect(() => {
     const supabase = createClient();
     let active = true;
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (active) setLoggedIn(Boolean(data.session));
-    });
+    async function prefill() {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session || !active) return;
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (active) setLoggedIn(Boolean(session));
-    });
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", session.user.id)
+          .maybeSingle();
 
+        const full = profile?.full_name?.trim();
+        if (active && full) setName((current) => current || full);
+      } catch {
+        // Nevadí — jméno zadá ručně.
+      }
+    }
+
+    void prefill();
     return () => {
       active = false;
-      sub.subscription.unsubscribe();
     };
   }, []);
-
-  if (isLoggedIn === undefined) {
-    return (
-      <div className="card p-6" aria-busy="true">
-        <div className="skeleton h-5 w-40 rounded-lg" />
-        <div className="skeleton mt-3 h-4 w-full rounded-full" />
-        <div className="skeleton mt-6 h-9 w-32 rounded-full" />
-      </div>
-    );
-  }
-
-  if (!isLoggedIn) {
-    return (
-      <div className="card flex flex-col items-start gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="font-display text-lg font-bold">Byli jste u nás?</div>
-          <p className="text-ink-muted mt-1 text-sm">
-            Přihlaste se a napište, jak jste byli spokojení.
-          </p>
-        </div>
-        <Link href="/prihlaseni?next=/%23recenze" className="btn btn-ghost btn-sm shrink-0">
-          Přihlásit se
-        </Link>
-      </div>
-    );
-  }
 
   if (state.status === "success") {
     return (
       <div className="card glow-accent flex items-center gap-4 p-6">
         <div className="bg-accent/15 text-accent grid size-10 shrink-0 place-items-center rounded-full">
-          <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            viewBox="0 0 24 24"
+            className="size-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M20 6L9 17l-5-5" />
           </svg>
         </div>
@@ -73,8 +68,43 @@ export function ReviewForm() {
   }
 
   return (
-    <form action={action} className="card sheen flex flex-col gap-5 p-6">
-      <div className="font-display text-lg font-bold">Napište nám recenzi</div>
+    <form action={action} className="card sheen relative flex flex-col gap-5 p-6">
+      <div>
+        <div className="font-display text-lg font-bold">Napište nám recenzi</div>
+        <p className="text-ink-muted mt-1.5 text-sm">
+          Účet k tomu nepotřebujete — stačí vyplnit jméno.
+        </p>
+      </div>
+
+      {/* Past na roboty — pro člověka neviditelná. */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden
+        className="pointer-events-none absolute size-0 opacity-0"
+      />
+
+      <div>
+        <label className="label" htmlFor="review-name">
+          Vaše jméno
+        </label>
+        <input
+          id="review-name"
+          name="authorName"
+          className="field"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="např. Martin K."
+          maxLength={80}
+          autoComplete="name"
+          required
+        />
+        <p className="text-ink-faint mt-1.5 text-xs">
+          Zobrazí se u recenze. Klidně jen křestní jméno a příjmení zkratkou.
+        </p>
+      </div>
 
       <div>
         <span className="label">Hodnocení</span>
