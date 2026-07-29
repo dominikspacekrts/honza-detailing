@@ -55,6 +55,26 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+@layer base {
+  /* Archivo je variabilní i v šířce — mírné rozšíření dává nadpisům
+     ten typický nádech motorsportového značení. */
+  .font-display {
+    font-stretch: 112%;
+    letter-spacing: -0.015em;
+  }
+
+  /* Kapitálky v odznacích snesou naopak zúžení a víc prostoru mezi znaky. */
+  .eyebrow,
+  .label {
+    font-stretch: 96%;
+  }
+
+  h1.font-display,
+  h2.font-display {
+    letter-spacing: -0.03em;
+  }
+}
+
 ::selection {
   background: color-mix(in oklab, var(--accent) 34%, transparent);
   color: #fff;

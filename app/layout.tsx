@@ -1,15 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
+import { Archivo, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import { ThemeStyle } from "@/components/site/theme-style";
 import { getSiteSettings } from "@/lib/settings";
 import "./globals.css";
 
-const sans = Geist({ variable: "--font-sans-custom", subsets: ["latin", "latin-ext"] });
-const mono = Geist_Mono({ variable: "--font-mono-custom", subsets: ["latin"] });
-const display = Space_Grotesk({
+const sans = Instrument_Sans({
+  variable: "--font-sans-custom",
+  subsets: ["latin", "latin-ext"],
+});
+
+/** Nadpisy — rozšířený grotesk s nádechem motorsportového typaření. */
+const display = Archivo({
   variable: "--font-display-custom",
   subsets: ["latin", "latin-ext"],
-  weight: ["500", "600", "700"],
+  axes: ["wdth"],
+});
+
+const mono = JetBrains_Mono({
+  variable: "--font-mono-custom",
+  subsets: ["latin", "latin-ext"],
 });
 
 export async function generateMetadata(): Promise<Metadata> {
